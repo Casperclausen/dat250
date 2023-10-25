@@ -1,0 +1,24 @@
+{% extends 'base.html'%} {%block content%}
+<center>
+<h1>
+   Sign Up
+</h1>
+<form action= "{{url_for("register")}}" method= "POST">
+<br> <br>
+<input type="name" name="username" placeholder="Username">
+<br>
+<input type="name" name="firstname" placeholder="First name">
+<br>
+<input type="name" name="lastname" placeholder="Last name">
+<br>
+<input type="password" name="password" placeholder="Password">
+<br>
+<input type="submit" name="submit" value="Register">
+<p>
+</form>
+</center>
+
+
+</p>
+</div>
+{%endblock%}

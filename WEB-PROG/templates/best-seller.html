@@ -1,0 +1,72 @@
+{%extends 'base.html'%} {% block title %}Best seller{% endblock %}
+{%block head%}
+<i class="fas fa-shopping-bag" id="shopping-cart-icon"></i>
+<div class="shopping-cart">
+    <h2 class="shopping-cart-title">CART</h2>
+    <div class="cart-content">
+        
+    </div>
+    <div class="total">
+        <div class="total-title">Total</div>
+        <div class="total-price">$0</div>
+    </div>
+    <button type="button" class="checkout-button">Buy Now</button>
+    <i class="fas fa-times" id="close-shopping-cart"></i>
+</div>
+{%endblock%}
+
+{%block search%}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="/">All Categories</a></li>
+        <li><a class="dropdown-item" href="deal">Deals</a></li>
+        <li><a class="dropdown-item" href="best-seller">Best Sellers</a></li>
+    </ul> 
+</li>
+<form class="d-flex">
+    <input class="form-control me-2" type="search" name="" id="search-item" placeholder="Search products" onkeyup="search()">
+</form>
+{%endblock%}
+{%block products%}
+<div class="product-container" id="product-container">
+    <h2 class="product-sale">Featured Products</h2>
+    <div class="row">
+        <div class="product">
+            <img src="static/images/lightsaber.webp" id="product-image">
+            <h4 class="product-title">Lightsaber</h4>
+            <span class="price">$449.99</span>
+            <i class="fa-sharp fa-solid fa-bag-shopping add-cart" id="cart-iconproduct"></i>
+        </div>
+        <div class="product">
+            <img src="static/images/ball.jpg" id="product-image">
+            <h4 class="product-title">Rocky's Ball</h4>
+            <span class="price">$59.99</span>
+            <i class="fa-sharp fa-solid fa-bag-shopping add-cart" id="cart-iconproduct"></i>
+        </div>
+        <div class="product">
+            <img src="static/images/Lord_of_rings.jpg" id="product-image">
+            <h4 class="product-title">The One Ring</h4>
+            <span class="price">$999.99</span>
+            <i class="fa-sharp fa-solid fa-bag-shopping add-cart" id="cart-iconproduct"></i>
+        </div>
+        <div class="product">
+            <img src="static/images/inviscloak.jpg" id="product-image">
+            <p id="avslag">15%</p>
+            <h4 class="product-title">Invisibility Cloak</h4>
+            <span class="price">$211.99</span>
+            <span class="price-deal"><strike>$249.99</strike></span>
+            <i class="fa-sharp fa-solid fa-bag-shopping add-cart" id="cart-iconproduct"></i>
+        </div>
+    </div>
+</div>
+{%endblock%}
+<div id="menu-dropdown">
+    <p id="dropdown-text">All Categories</p>
+    <img src="static/images/arrow.png">
+    <ul id="list-categories">
+        <li class="options"><a href="/">All Categories</a></li>
+        <li class="options"><a href="deal">Deals</a></li>
+        <li class="options"><a href="best-seller">Best Sellers</a></li>   
+    </ul>
+</div>
