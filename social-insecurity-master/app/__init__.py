@@ -8,6 +8,8 @@ from flask import Flask
 from app.config import Config
 from app.database import SQLite3
 
+from werkzeug.security import generate_password_hash, check_password_hash
+
 # from flask_login import LoginManager
 # from flask_bcrypt import Bcrypt
 # from flask_wtf.csrf import CSRFProtect
@@ -24,6 +26,19 @@ sqlite = SQLite3(app, schema="schema.sql")
 
 # TODO: The passwords are stored in plaintext, this is not secure at all. I should probably use bcrypt or something
 # bcrypt = Bcrypt(app)
+
+def valid_login(username, password):
+    """Checks if username-password combination is valid."""
+
+    # Fetch the user record from the database
+    user = sqlite.query("SELECT * FROM Users WHERE username=?", True, username)
+    
+    # If the user doesn't exist
+    if not user:
+        return False
+    
+    # If the user exists, check the hashed password
+    return check_password_hash(user["password"], password)
 
 # TODO: The CSRF protection is not working, I should probably fix that
 # csrf = CSRFProtect(app)
