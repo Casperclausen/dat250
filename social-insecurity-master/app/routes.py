@@ -12,7 +12,20 @@ from app import app, sqlite
 from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
 
 from werkzeug.security import generate_password_hash, check_password_hash
+import re
 
+def check_password_strength(password):
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"[0-9]", password):
+        return False
+    if not re.search(r"[!@#$%^&*]", password):
+        return False
+    return True
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
@@ -45,6 +58,15 @@ def index():
 
 
     elif register_form.is_submitted() and register_form.submit.data:
+        
+        if register_form.password.data != register_form.confirm_password.data:
+            flash("Passwords do not match.", category="error")
+            return redirect(url_for("index"))
+        
+        if not check_password_strength(register_form.password.data):
+            flash("Weak password! Ensure it's at least 8 characters, with uppercase, lowercase, numbers, and special characters.", category="error")
+            return redirect(url_for("index"))
+        
         hashed_password = generate_password_hash(register_form.password.data)
         insert_user = f"""
             INSERT INTO Users (username, first_name, last_name, password)
