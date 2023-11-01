@@ -8,7 +8,7 @@ from flask import Flask
 from app.config import Config
 from app.database import SQLite3
 
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
 # from flask_login import LoginManager
 # from flask_bcrypt import Bcrypt
@@ -54,3 +54,7 @@ with app.app_context():
 
 # Import the routes after the app is configured
 from app import routes  # noqa: E402,F401
+
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
