@@ -9,10 +9,9 @@ from pathlib import Path
 from flask import flash, redirect, render_template, send_from_directory, url_for, session
 
 from app import app, sqlite
-from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm, IndexForm
-from app import valid_login
+from app.forms import CommentsForm, FriendsForm, IndexForm, PostForm, ProfileForm
 
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import re
 
 def check_password_strength(password):
@@ -25,7 +24,6 @@ def check_password_strength(password):
     if not re.search(r"[0-9]", password):
         return False
     return True
-
 
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
@@ -41,38 +39,46 @@ def index():
     login_form = index_form.login
     register_form = index_form.register
 
-    if login_form.validate_on_submit():
-        if valid_login(login_form.username.data, login_form.password.data):
-            
-            user_query = "SELECT * FROM Users WHERE username = ?;"
-            user = sqlite.query(user_query, True, (login_form.username.data,))
-            session['username'] = user['username']
-            session['user_id'] = user['id']
-            flash("Logged in successfully!", category="success")
-            return redirect(url_for("stream", username=user['username']))
-        else:
-            flash("Invalid username or password.", category="danger")
+    
 
-    elif register_form.validate_on_submit():
+    if login_form.is_submitted() and login_form.submit.data:
+        get_user = f"""
+            SELECT *
+            FROM Users
+            WHERE username = '{login_form.username.data}';
+            """
+        user = sqlite.query(get_user, one=True)
+
+        if user is None:
+            flash("Sorry, this user does not exist!", category="warning")
+        elif not check_password_hash(user["password"], login_form.password.data):
+            flash("Sorry, wrong password!", category="warning")
+        else:
+            session['username'] = login_form.username.data
+            return redirect(url_for("stream", username=login_form.username.data))
+
+
+    elif register_form.is_submitted() and register_form.submit.data:
+        
         if register_form.password.data != register_form.confirm_password.data:
             flash("Passwords do not match.", category="error")
-        elif not check_password_strength(register_form.password.data):
-            flash("Weak password! Ensure it's at least 8 characters, with uppercase, lowercase and numbers.", category="error")
-        else:
-            existing_user_query = "SELECT * FROM Users WHERE username = ?;"
-            existing_user = sqlite.query(existing_user_query, True, (register_form.username.data,))
-            if existing_user is not None:
-                flash("Username already taken.", category="error")
-                return redirect(url_for("index"))
-            hashed_password = generate_password_hash(register_form.password.data, method='pbkdf2:sha256', salt_length=16)
-            insert_user_query = "INSERT INTO Users (username, first_name, last_name, password) VALUES (?, ?, ?, ?);"
-            sqlite.query(insert_user_query, (register_form.username.data, register_form.first_name.data, register_form.last_name.data, hashed_password))
-            flash("User successfully created!", category="success")
             return redirect(url_for("index"))
+        
+        if not check_password_strength(register_form.password.data):
+            flash("Weak password! Ensure it's at least 8 characters, with uppercase, lowercase and numbers.", category="error")
+            return redirect(url_for("index"))
+        
+        hashed_password = generate_password_hash(register_form.password.data)
+        insert_user = f"""
+            INSERT INTO Users (username, first_name, last_name, password)
+            VALUES ('{register_form.username.data}', '{register_form.first_name.data}', '{register_form.last_name.data}', '{hashed_password}');
+            """
+        sqlite.query(insert_user)
+        flash("User successfully created!", category="success")
+        return redirect(url_for("index"))
+
 
     return render_template("index.html.j2", title="Welcome", form=index_form)
-
-
 
 
 @app.route("/stream/<string:username>", methods=["GET", "POST"])
